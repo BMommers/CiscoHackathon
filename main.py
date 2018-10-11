@@ -29,7 +29,10 @@ class Button:
         GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     def isPressed(self):
-        return GPIO.input(self.pin)
+        if GPIO.input(self.pin) == 1:
+            return False
+        else:
+            return True
 
 def create_connection(db_file):
     """ create a database connection to the SQLite database
