@@ -1,5 +1,6 @@
-import sqlite3, SimpleMFRC522
+import sqlite3
 from sqlite3 import Error
+from NFCLezen import nfc
 
 
 def create_connection(db_file):
