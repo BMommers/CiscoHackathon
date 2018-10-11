@@ -36,8 +36,10 @@ def create_connection(db_file):
 
     return None
 
+
 def epochTime():
     return int(str(datetime.datetime.now().timestamp()).split(".")[0])
+
 
 def validEID(eid):
     cur = conn.cursor()
@@ -45,17 +47,20 @@ def validEID(eid):
     cur.execute(sql, (eid,))
     return bool(cur.fetchone()[0])
 
+
 def inRecords(eid):
     cur = conn.cursor()
     sql = """ SELECT count(1) FROM EIDregels WHERE id = ? """
     cur.execute(sql, (eid,))
     return bool(cur.fetchone()[0])
 
+
 def recordVote(eid):
     cur = conn.cursor()
     sql = """ INSERT INTO EIDregels (id, datetime) VALUES (?, ?) """
     cur.execute(sql, (eid, epochTime()))
     conn.commit()
+
 
 def readNFC():
     return 12345678
