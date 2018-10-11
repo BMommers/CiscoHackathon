@@ -51,7 +51,7 @@ def addEID(eid):
     conn.commit()
 
 
-database = "D:\\Librarys\\intelliJ-workspace\\CiscoHackathon\\database.sqlite"
+database = "database.sqlite"
 
 # create a database connection
 conn = create_connection(database)

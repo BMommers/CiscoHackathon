@@ -70,7 +70,7 @@ greenLED = LED(13)
 yellowLED = LED(19)
 redLED = LED(26)
 
-database = "D:\\Librarys\\intelliJ-workspace\\CiscoHackathon\\database.sqlite"
+database = "database.sqlite"
 conn = create_connection(database)
 
 reader = SimpleMFRC522.SimpleMFRC522()
