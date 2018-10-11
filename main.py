@@ -1,6 +1,7 @@
-import sqlite3, datetime, SimpleMFRC522, time
+import sqlite3, time
 from sqlite3 import Error
 import RPi.GPIO as GPIO
+
 
 
 class LED:
@@ -22,6 +23,14 @@ class LED:
         GPIO.output(self.pin, self.state)
 
 
+class Button:
+    def __init__(self, pin):
+        self.pin = pin
+        GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+    def isPressed(self):
+        return GPIO.input(self.pin)
+
 def create_connection(db_file):
     """ create a database connection to the SQLite database
         specified by the db_file
@@ -29,8 +38,8 @@ def create_connection(db_file):
     :return: Connection object or None
     """
     try:
-        conn = sqlite3.connect(db_file)
-        return conn
+        c = sqlite3.connect(db_file)
+        return c
     except Error as e:
         print(e)
 
@@ -38,7 +47,7 @@ def create_connection(db_file):
 
 
 def epochTime():
-    return int(str(datetime.datetime.now().timestamp()).split(".")[0])
+    return int(str(time.time()).split(".")[0])
 
 
 def validEID(eid):
@@ -70,27 +79,26 @@ greenLED = LED(13)
 yellowLED = LED(19)
 redLED = LED(26)
 
+authCiv = Button(21)
+unauthCiv = Button(20)
+
 database = "database.sqlite"
 conn = create_connection(database)
 
-reader = SimpleMFRC522.SimpleMFRC522()
-
 while True:
-    try:
-        id, eid = reader.read()
-    finally:
-        GPIO.cleanup()
+    if authCiv.isPressed():
+        eid = 452
+    elif unauthCiv.isPressed():
+        eid = 738
+    else:
+        continue
+    GPIO.cleanup()
 
-    if validEID(eid):
-        if not inRecords(eid):
-            recordVote(eid)
-            greenLED.turnOn()
-            time.sleep(3)
-            greenLED.turnOff()
-        else:
-            redLED.turnOn()
-            time.sleep(3)
-            redLED.turnOff()
+    if validEID(eid) and not inRecords(eid):
+        recordVote(eid)
+        greenLED.turnOn()
+        time.sleep(3)
+        greenLED.turnOff()
     else:
         redLED.turnOn()
         time.sleep(3)
