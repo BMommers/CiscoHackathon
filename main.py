@@ -1,4 +1,4 @@
-import sqlite3, datetime, SimpleMFRC522
+import sqlite3, datetime, SimpleMFRC522, time
 from sqlite3 import Error
 import RPi.GPIO as GPIO
 
@@ -6,7 +6,8 @@ import RPi.GPIO as GPIO
 class LED:
     def __init__(self, gpiopin):
         self.state = 0
-        self.gpioPin = gpiopin
+        self.pin = gpiopin
+        GPIO.setup(gpiopin, GPIO.OUT)
 
     def turnOn(self):
         self.state = 1
@@ -18,7 +19,7 @@ class LED:
 
     def updateLED(self):
         # functie om LED aan te passen aan de state
-        pass
+        GPIO.output(self.pin, self.state)
 
 
 def create_connection(db_file):
@@ -78,3 +79,14 @@ while True:
     if validEID(eid):
         if not inRecords(eid):
             recordVote(eid)
+            greenLED.turnOn()
+            time.sleep(3)
+            greenLED.turnOff()
+        else:
+            redLED.turnOn()
+            time.sleep(3)
+            redLED.turnOff()
+    else:
+        redLED.turnOn()
+        time.sleep(3)
+        redLED.turnOff()
