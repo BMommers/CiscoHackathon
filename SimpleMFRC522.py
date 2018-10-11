@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO
   
 class SimpleMFRC522:
 
-  READER = None;
+  READER = None
   
   KEY = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
   BLOCK_ADDRS = [8, 9, 10]
@@ -45,7 +45,7 @@ class SimpleMFRC522:
         for block_num in self.BLOCK_ADDRS:
             block = self.READER.MFRC522_Read(block_num) 
             if block:
-            		data += block
+                data += block
         if data:
              text_read = ''.join(chr(i) for i in data)
     self.READER.MFRC522_StopCrypto1()

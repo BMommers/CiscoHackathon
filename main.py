@@ -1,5 +1,6 @@
-import sqlite3, datetime
+import sqlite3, datetime, SimpleMFRC522
 from sqlite3 import Error
+import RPi.GPIO as GPIO
 
 
 class LED:
@@ -37,9 +38,15 @@ def create_connection(db_file):
 def epochTime():
     return int(str(datetime.datetime.now().timestamp()).split(".")[0])
 
-def checkEID(eid):
+def validEID(eid):
     cur = conn.cursor()
     sql = """ SELECT count(1) FROM EID WHERE id = ? """
+    cur.execute(sql, (eid,))
+    return bool(cur.fetchone()[0])
+
+def inRecords(eid):
+    cur = conn.cursor()
+    sql = """ SELECT count(1) FROM EIDregels WHERE id = ? """
     cur.execute(sql, (eid,))
     return bool(cur.fetchone()[0])
 
@@ -59,13 +66,15 @@ redLED = LED(26)
 
 database = "D:\\Librarys\\intelliJ-workspace\\CiscoHackathon\\database.sqlite"
 conn = create_connection(database)
-cur = conn.cursor()
 
+reader = SimpleMFRC522.SimpleMFRC522()
 
+while True:
+    try:
+        id, eid = reader.read()
+    finally:
+        GPIO.cleanup()
 
-if checkEID(123):
-    recordVote(123)
-
-#while True:
-#    eid = readNFC()
-#    if
+    if validEID(eid):
+        if not inRecords(eid):
+            recordVote(eid)
