@@ -1,14 +1,15 @@
 import sqlite3, time
 from sqlite3 import Error
 import RPi.GPIO as GPIO
-
+GPIO.cleanup()
+GPIO.setmode(GPIO.BCM)
 
 
 class LED:
     def __init__(self, gpiopin):
         self.state = 0
         self.pin = gpiopin
-        GPIO.setup(gpiopin, GPIO.OUT)
+        GPIO.setup(self.pin, GPIO.OUT)
 
     def turnOn(self):
         self.state = 1
@@ -95,7 +96,7 @@ while True:
         eid = 738
     else:
         continue
-    GPIO.cleanup()
+#    GPIO.cleanup()
 
     if validEID(eid) and not inRecords(eid):
         recordVote(eid)
@@ -106,3 +107,5 @@ while True:
         redLED.turnOn()
         time.sleep(3)
         redLED.turnOff()
+
+GPIO.cleanup()

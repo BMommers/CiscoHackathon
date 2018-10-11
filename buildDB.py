@@ -1,4 +1,4 @@
-import sqlite3, SimpleMFRC522
+import sqlite3
 from sqlite3 import Error
 
 
@@ -34,9 +34,6 @@ def resetDB():
  ;
  ''')
 
-def nfcAddEID():
-    id, eid = reader.read()
-    addEID(int(eid))
 
 def manAddEID():
     eid = eval(input("Wat is het EID:   "))
@@ -56,7 +53,6 @@ database = "database.sqlite"
 # create a database connection
 conn = create_connection(database)
 
-reader = SimpleMFRC522.SimpleMFRC522()
 
 menu = """1: Reset Database\n2: Add e-ID\n3: Manually add e-ID\n4:Exit\n\n"""
 
@@ -68,7 +64,7 @@ while True:
         resetDB()
         addEID(123)
     elif x == 2:
-        nfcAddEID()
+        continue
     elif x == 3:
         manAddEID()
     else:
