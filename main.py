@@ -1,15 +1,13 @@
-import sqlite3, time
+import sqlite3, datetime, SimpleMFRC522, time
 from sqlite3 import Error
 import RPi.GPIO as GPIO
-GPIO.cleanup()
-GPIO.setmode(GPIO.BCM)
 
 
 class LED:
     def __init__(self, gpiopin):
         self.state = 0
         self.pin = gpiopin
-        GPIO.setup(self.pin, GPIO.OUT)
+        GPIO.setup(gpiopin, GPIO.OUT)
 
     def turnOn(self):
         self.state = 1
@@ -24,17 +22,6 @@ class LED:
         GPIO.output(self.pin, self.state)
 
 
-class Button:
-    def __init__(self, pin):
-        self.pin = pin
-        GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-    def isPressed(self):
-        if GPIO.input(self.pin) == 1:
-            return False
-        else:
-            return True
-
 def create_connection(db_file):
     """ create a database connection to the SQLite database
         specified by the db_file
@@ -42,8 +29,8 @@ def create_connection(db_file):
     :return: Connection object or None
     """
     try:
-        c = sqlite3.connect(db_file)
-        return c
+        conn = sqlite3.connect(db_file)
+        return conn
     except Error as e:
         print(e)
 
@@ -51,7 +38,7 @@ def create_connection(db_file):
 
 
 def epochTime():
-    return int(str(time.time()).split(".")[0])
+    return int(str(datetime.datetime.now().timestamp()).split(".")[0])
 
 
 def validEID(eid):
@@ -83,29 +70,28 @@ greenLED = LED(13)
 yellowLED = LED(19)
 redLED = LED(26)
 
-authCiv = Button(21)
-unauthCiv = Button(20)
-
 database = "database.sqlite"
 conn = create_connection(database)
 
-while True:
-    if authCiv.isPressed():
-        eid = 452
-    elif unauthCiv.isPressed():
-        eid = 738
-    else:
-        continue
-#    GPIO.cleanup()
+reader = SimpleMFRC522.SimpleMFRC522()
 
-    if validEID(eid) and not inRecords(eid):
-        recordVote(eid)
-        greenLED.turnOn()
-        time.sleep(3)
-        greenLED.turnOff()
+while True:
+    try:
+        id, eid = reader.read()
+    finally:
+        GPIO.cleanup()
+
+    if validEID(eid):
+        if not inRecords(eid):
+            recordVote(eid)
+            greenLED.turnOn()
+            time.sleep(3)
+            greenLED.turnOff()
+        else:
+            redLED.turnOn()
+            time.sleep(3)
+            redLED.turnOff()
     else:
         redLED.turnOn()
         time.sleep(3)
         redLED.turnOff()
-
-GPIO.cleanup()
